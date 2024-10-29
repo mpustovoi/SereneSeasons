@@ -25,15 +25,15 @@ public class SeasonHooks
     // Hooks called by ASM
     //
 
-    public static boolean shouldSnowHook(Biome biome, LevelReader levelReader, BlockPos pos)
+    public static boolean shouldSnowHook(Biome biome, LevelReader levelReader, BlockPos pos, int seaLevel)
     {
-        if ((ModConfig.seasons.generateSnowAndIce && warmEnoughToRainSeasonal(levelReader, pos)) || (!ModConfig.seasons.generateSnowAndIce && biome.warmEnoughToRain(pos)))
+        if ((ModConfig.seasons.generateSnowAndIce && warmEnoughToRainSeasonal(levelReader, pos, seaLevel)) || (!ModConfig.seasons.generateSnowAndIce && biome.warmEnoughToRain(pos, seaLevel)))
         {
             return false;
         }
         else
         {
-            if (pos.getY() >= levelReader.getMinBuildHeight() && pos.getY() < levelReader.getMaxBuildHeight() && levelReader.getBrightness(LightLayer.BLOCK, pos) < 10)
+            if (levelReader.isInsideBuildHeight(pos.getY()) && levelReader.getBrightness(LightLayer.BLOCK, pos) < 10)
             {
                 BlockState blockstate = levelReader.getBlockState(pos);
                 if (blockstate.isAir() && Blocks.SNOW.defaultBlockState().canSurvive(levelReader, pos))
@@ -46,9 +46,9 @@ public class SeasonHooks
         }
     }
 
-    public static boolean shouldFreezeWarmEnoughToRainHook(Biome biome, BlockPos pos, LevelReader levelReader)
+    public static boolean shouldFreezeWarmEnoughToRainHook(Biome biome, BlockPos pos, int seaLevel, LevelReader levelReader)
     {
-        return (ModConfig.seasons.generateSnowAndIce && warmEnoughToRainSeasonal(levelReader, pos)) || (!ModConfig.seasons.generateSnowAndIce && biome.warmEnoughToRain(pos));
+        return (ModConfig.seasons.generateSnowAndIce && warmEnoughToRainSeasonal(levelReader, pos, seaLevel)) || (!ModConfig.seasons.generateSnowAndIce && biome.warmEnoughToRain(pos, seaLevel));
     }
 
     public static boolean isRainingAtHook(Level level, BlockPos position)
@@ -62,11 +62,11 @@ public class SeasonHooks
 
             if (ModConfig.seasons.isDimensionWhitelisted(level.dimension()) && !biome.is(ModTags.Biomes.BLACKLISTED_BIOMES))
             {
-                return getPrecipitationAtSeasonal(level, biome, position) == Biome.Precipitation.RAIN && warmEnoughToRainSeasonal(level, biome, position);
+                return getPrecipitationAtSeasonal(level, biome, position, level.getSeaLevel()) == Biome.Precipitation.RAIN && warmEnoughToRainSeasonal(level, biome, position, level.getSeaLevel());
             }
             else
             {
-                return biome.value().getPrecipitationAt(position) == Biome.Precipitation.RAIN && biome.value().getTemperature(position) >= 0.15F;
+                return biome.value().getPrecipitationAt(position, level.getSeaLevel()) == Biome.Precipitation.RAIN && biome.value().getTemperature(position, level.getSeaLevel()) >= 0.15F;
             }
         }
     }
@@ -75,7 +75,7 @@ public class SeasonHooks
     // Hooks for different calls to getPrecipitationAt in Biome
     //
 
-    public static Biome.Precipitation getPrecipitationAtTickIceAndSnowHook(LevelReader level, Biome biome, BlockPos pos)
+    public static Biome.Precipitation getPrecipitationAtTickIceAndSnowHook(LevelReader level, Biome biome, BlockPos pos, int seaLevel)
     {
         if (!biome.hasPrecipitation())
         {
@@ -83,7 +83,7 @@ public class SeasonHooks
         }
         else
         {
-            boolean shouldSnow = (ModConfig.seasons.generateSnowAndIce && coldEnoughToSnowSeasonal(level, pos)) || (!ModConfig.seasons.generateSnowAndIce && biome.coldEnoughToSnow(pos));
+            boolean shouldSnow = (ModConfig.seasons.generateSnowAndIce && coldEnoughToSnowSeasonal(level, pos, seaLevel)) || (!ModConfig.seasons.generateSnowAndIce && biome.coldEnoughToSnow(pos, seaLevel));
             return shouldSnow ? Biome.Precipitation.SNOW : Biome.Precipitation.RAIN;
         }
     }
@@ -91,50 +91,50 @@ public class SeasonHooks
     //
     // General utilities
     //
-    public static boolean coldEnoughToSnowSeasonal(LevelReader level, BlockPos pos)
+    public static boolean coldEnoughToSnowSeasonal(LevelReader level, BlockPos pos, int seaLevel)
     {
-        return coldEnoughToSnowSeasonal(level, level.getBiome(pos), pos);
+        return coldEnoughToSnowSeasonal(level, level.getBiome(pos), pos, seaLevel);
     }
 
-    public static boolean coldEnoughToSnowSeasonal(LevelReader level, Holder<Biome> biome, BlockPos pos)
+    public static boolean coldEnoughToSnowSeasonal(LevelReader level, Holder<Biome> biome, BlockPos pos, int seaLevel)
     {
-        return !warmEnoughToRainSeasonal(level, biome, pos);
+        return !warmEnoughToRainSeasonal(level, biome, pos, seaLevel);
     }
 
-    public static boolean warmEnoughToRainSeasonal(LevelReader level, BlockPos pos)
+    public static boolean warmEnoughToRainSeasonal(LevelReader level, BlockPos pos, int seaLevel)
     {
-        return warmEnoughToRainSeasonal(level, level.getBiome(pos), pos);
+        return warmEnoughToRainSeasonal(level, level.getBiome(pos), pos, seaLevel);
     }
 
-    public static boolean warmEnoughToRainSeasonal(LevelReader level, Holder<Biome> biome, BlockPos pos)
+    public static boolean warmEnoughToRainSeasonal(LevelReader level, Holder<Biome> biome, BlockPos pos, int seaLevel)
     {
-        return getBiomeTemperature(level, biome, pos) >= 0.15F;
+        return getBiomeTemperature(level, biome, pos, seaLevel) >= 0.15F;
     }
 
-    public static float getBiomeTemperature(LevelReader level, Holder<Biome> biome, BlockPos pos)
+    public static float getBiomeTemperature(LevelReader level, Holder<Biome> biome, BlockPos pos, int seaLevel)
     {
         if (!(level instanceof Level))
         {
-            return biome.value().getTemperature(pos);
+            return biome.value().getTemperature(pos, seaLevel);
         }
 
-        return getBiomeTemperature((Level)level, biome, pos);
+        return getBiomeTemperature((Level)level, biome, pos, seaLevel);
     }
 
-    public static float getBiomeTemperature(Level level, Holder<Biome> biome, BlockPos pos)
+    public static float getBiomeTemperature(Level level, Holder<Biome> biome, BlockPos pos, int seaLevel)
     {
         if (!ModConfig.seasons.isDimensionWhitelisted(level.dimension()) || biome.is(ModTags.Biomes.BLACKLISTED_BIOMES))
         {
-            return biome.value().getTemperature(pos);
+            return biome.value().getTemperature(pos, seaLevel);
         }
 
-        return getBiomeTemperatureInSeason(new SeasonTime(SeasonHelper.getSeasonState(level).getSeasonCycleTicks()).getSubSeason(), biome, pos);
+        return getBiomeTemperatureInSeason(new SeasonTime(SeasonHelper.getSeasonState(level).getSeasonCycleTicks()).getSubSeason(), biome, pos, seaLevel);
     }
 
-    public static float getBiomeTemperatureInSeason(Season.SubSeason subSeason, Holder<Biome> biome, BlockPos pos)
+    public static float getBiomeTemperatureInSeason(Season.SubSeason subSeason, Holder<Biome> biome, BlockPos pos, int seaLevel)
     {
         boolean tropicalBiome = biome.is(ModTags.Biomes.TROPICAL_BIOMES);
-        float biomeTemp = biome.value().getTemperature(pos);
+        float biomeTemp = biome.value().getTemperature(pos, seaLevel);
         if (!tropicalBiome && biome.value().getBaseTemperature() <= 0.8F && !biome.is(ModTags.Biomes.BLACKLISTED_BIOMES))
         {
             biomeTemp = Mth.clamp(biomeTemp + ModConfig.seasons.getSeasonProperties(subSeason).biomeTempAdjustment(), -0.5F, 2.0F);
@@ -165,7 +165,7 @@ public class SeasonHooks
         return biome.value().hasPrecipitation();
     }
 
-    public static Biome.Precipitation getPrecipitationAtSeasonal(Level level, Holder<Biome> biome, BlockPos pos)
+    public static Biome.Precipitation getPrecipitationAtSeasonal(Level level, Holder<Biome> biome, BlockPos pos, int seaLevel)
     {
         if (!hasPrecipitationSeasonal(level, biome))
         {
@@ -173,7 +173,7 @@ public class SeasonHooks
         }
         else
         {
-            return coldEnoughToSnowSeasonal(level, biome, pos) ? Biome.Precipitation.SNOW : Biome.Precipitation.RAIN;
+            return coldEnoughToSnowSeasonal(level, biome, pos, seaLevel) ? Biome.Precipitation.SNOW : Biome.Precipitation.RAIN;
         }
     }
 }

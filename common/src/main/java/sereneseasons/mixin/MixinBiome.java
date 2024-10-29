@@ -20,12 +20,12 @@ public class MixinBiome
     @Inject(method="shouldSnow", at=@At("HEAD"), cancellable = true)
     public void onShouldSnow(LevelReader level, BlockPos pos, CallbackInfoReturnable<Boolean> cir)
     {
-        cir.setReturnValue(SeasonHooks.shouldSnowHook((Biome)(Object)this, level, pos));
+        cir.setReturnValue(SeasonHooks.shouldSnowHook((Biome)(Object)this, level, pos, level.getSeaLevel()));
     }
 
-    @Redirect(method = "shouldFreeze(Lnet/minecraft/world/level/LevelReader;Lnet/minecraft/core/BlockPos;Z)Z", at=@At(value = "INVOKE", target = "net/minecraft/world/level/biome/Biome.warmEnoughToRain(Lnet/minecraft/core/BlockPos;)Z"))
-    public boolean onShouldFreeze_warmEnoughToRain(Biome biome, BlockPos pos, LevelReader level)
+    @Redirect(method = "shouldFreeze(Lnet/minecraft/world/level/LevelReader;Lnet/minecraft/core/BlockPos;Z)Z", at=@At(value = "INVOKE", target = "net/minecraft/world/level/biome/Biome.warmEnoughToRain(Lnet/minecraft/core/BlockPos;I)Z"))
+    public boolean onShouldFreeze_warmEnoughToRain(Biome biome, BlockPos pos, int seaLevel, LevelReader level)
     {
-        return SeasonHooks.shouldFreezeWarmEnoughToRainHook(biome, pos, level);
+        return SeasonHooks.shouldFreezeWarmEnoughToRainHook(biome, pos, seaLevel, level);
     }
 }

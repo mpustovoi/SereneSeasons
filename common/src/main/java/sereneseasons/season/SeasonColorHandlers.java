@@ -25,6 +25,7 @@ import sereneseasons.util.SeasonColorUtil;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
 
 public class SeasonColorHandlers
 {
@@ -64,8 +65,8 @@ public class SeasonColorHandlers
 
         if (level == null) return originalColor;
 
-        Registry<Biome> biomeRegistry = level.registryAccess().registryOrThrow(Registries.BIOME);
-        Holder<Biome> biomeHolder = biomeRegistry.getResourceKey(biome).flatMap(biomeRegistry::getHolder).orElse(null);
+        Registry<Biome> biomeRegistry = level.registryAccess().lookupOrThrow(Registries.BIOME);
+        Holder.Reference<Biome> biomeHolder = biomeRegistry.getResourceKey(biome).flatMap(biomeRegistry::get).orElse(null);
 
         if (biomeHolder != null)
         {

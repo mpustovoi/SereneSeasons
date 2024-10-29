@@ -10,7 +10,7 @@
     "MixinServerLevel"
   ],
   "client": [
-    "client.MixinLevelRenderer",
+    "client.MixinWeatherEffectRenderer",
     "client.MixinBiomeClient"
   ],
   "injectors": {

@@ -6,17 +6,15 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import sereneseasons.core.SereneSeasons;
 import sereneseasons.init.ModConfig;
 import sereneseasons.init.ModFertility;
 import sereneseasons.init.ModTags;
@@ -33,7 +31,7 @@ public class SeasonalCropGrowthHandler
 		if (!ModConfig.fertility.seasonalCrops || !ModFertility.isCrop(state))
 			return;
 
-		Registry<Block> blockRegistry = level.registryAccess().registryOrThrow(Registries.BLOCK);
+		Registry<Block> blockRegistry = level.registryAccess().lookupOrThrow(Registries.BLOCK);
 		boolean isFertile = ModFertility.isCropFertile(blockRegistry.getKey(state.getBlock()).toString(), level, pos);
 
 		if (!isFertile && !isGlassAboveBlock(level, pos))
@@ -75,7 +73,7 @@ public class SeasonalCropGrowthHandler
 		BlockPos pos = hitResult.getBlockPos();
 		BlockState plant = level.getBlockState(pos);
 		Block plantBlock = plant.getBlock();
-		Registry<Block> blockRegistry = level.registryAccess().registryOrThrow(Registries.BLOCK);
+		Registry<Block> blockRegistry = level.registryAccess().lookupOrThrow(Registries.BLOCK);
 
 		if (!ModConfig.fertility.seasonalCrops || !ModFertility.isCrop(plant))
 			return;
@@ -89,13 +87,13 @@ public class SeasonalCropGrowthHandler
 				if (level.getRandom().nextInt(6) != 0)
 				{
 					event.setCancelled(true);
-					event.setCancelResult(InteractionResultHolder.success(stack));
+					event.setCancelResult(InteractionResult.SUCCESS);
 				}
 			}
             else if (ModConfig.fertility.outOfSeasonCropBehavior == 1)
             {
 				event.setCancelled(true);
-				event.setCancelResult(InteractionResultHolder.fail(stack));
+				event.setCancelResult(InteractionResult.FAIL);
             }
             else if (ModConfig.fertility.outOfSeasonCropBehavior == 2)
             {
@@ -103,7 +101,7 @@ public class SeasonalCropGrowthHandler
                 {
                     level.destroyBlock(pos, false);
 					event.setCancelled(true);
-					event.setCancelResult(InteractionResultHolder.success(stack));
+					event.setCancelResult(InteractionResult.SUCCESS);
                 }
                 else
                 {

@@ -75,7 +75,7 @@ public class RandomUpdateHandler
 			Holder<Biome> biome = world.getBiome(topAirPos);
 			Holder<Biome> groundBiome = world.getBiome(topGroundPos);
 
-			if (!biome.is(ModTags.Biomes.BLACKLISTED_BIOMES) && SeasonHooks.getBiomeTemperature(world, biome, topGroundPos) >= 0.15F)
+			if (!biome.is(ModTags.Biomes.BLACKLISTED_BIOMES) && SeasonHooks.getBiomeTemperature(world, biome, topGroundPos, world.getSeaLevel()) >= 0.15F)
 			{
 				if (aboveGroundState.getBlock() == Blocks.SNOW)
 				{
@@ -83,7 +83,7 @@ public class RandomUpdateHandler
 				}
 			}
 
-			if (!groundBiome.is(ModTags.Biomes.BLACKLISTED_BIOMES) && SeasonHooks.getBiomeTemperature(world, groundBiome, topGroundPos) >= 0.15F)
+			if (!groundBiome.is(ModTags.Biomes.BLACKLISTED_BIOMES) && SeasonHooks.getBiomeTemperature(world, groundBiome, topGroundPos, world.getSeaLevel()) >= 0.15F)
 			{
 				if (groundState.getBlock() == Blocks.ICE)
 				{

@@ -2,18 +2,10 @@
   "type": "minecraft:crafting_shaped",
   "category": "redstone",
   "key": {
-    "#": {
-      "item": "minecraft:cobblestone_slab"
-    },
-    "C": {
-      "item": "sereneseasons:calendar"
-    },
-    "G": {
-      "item": "minecraft:glass"
-    },
-    "Q": {
-      "item": "minecraft:quartz"
-    }
+    "#": "minecraft:cobblestone_slab",
+    "C": "sereneseasons:calendar",
+    "G": "minecraft:glass",
+    "Q": "minecraft:quartz"
   },
   "pattern": [
     "GGG",

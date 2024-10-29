@@ -96,7 +96,7 @@ public class ModFertility
         }
         else
         {
-            if (!biome.value().warmEnoughToRain(pos))
+            if (!biome.value().warmEnoughToRain(pos, level.getSeaLevel()))
             {
                 if (winterPlants.contains(cropName))
                 {
@@ -139,7 +139,7 @@ public class ModFertility
 
     private static void populateSeasonCrops(TagKey<Block> tag, Set<String> cropSet, int bitmask)
     {
-        BuiltInRegistries.BLOCK.getTag(tag).ifPresent(blocks ->
+        BuiltInRegistries.BLOCK.get(tag).ifPresent(blocks ->
         {
             for (Holder<Block> block : blocks)
             {
@@ -176,7 +176,7 @@ public class ModFertility
 
     private static void populateSeasonSeeds(TagKey<Item> tag, Set<String> cropSet, int bitmask)
     {
-        BuiltInRegistries.ITEM.getTag(tag).ifPresent(items ->
+        BuiltInRegistries.ITEM.get(tag).ifPresent(items ->
         {
             for (Holder<Item> item : items)
             {

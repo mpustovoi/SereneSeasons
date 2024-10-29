@@ -38,11 +38,10 @@ public class SeasonHandler implements SeasonHelper.ISeasonDataProvider
 
     public static void onLevelTick(TickEvent.Level event)
     {
-        Level level = event.getLevel();
-
-        if (event.getPhase() != TickEvent.Phase.START || level.isClientSide() || !ModConfig.seasons.isDimensionWhitelisted(level.dimension()))
+        if (event.getPhase() != TickEvent.Phase.START || event.getLevel().isClientSide() || !ModConfig.seasons.isDimensionWhitelisted(event.getLevel().dimension()))
             return;
 
+        ServerLevel level = (ServerLevel)event.getLevel();
         long dayTime = level.getDayTime();
         long lastDayTime = lastDayTimes.getOrDefault(level, dayTime);
         lastDayTimes.put(level, dayTime);

@@ -27,6 +27,6 @@ public class DataGenerationHandler
         generator.addProvider(event.includeClient(), new SSItemModelProvider(output, existingFileHelper));
 
         // Recipes
-        generator.addProvider(event.includeServer(), new SSRecipeProvider(output, event.getLookupProvider()));
+        generator.addProvider(event.includeServer(), new SSRecipeProvider.Runner(output, event.getLookupProvider()));
     }
 }

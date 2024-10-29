@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "C": {
-      "item": "minecraft:clock"
-    },
-    "P": {
-      "item": "minecraft:paper"
-    }
+    "C": "minecraft:clock",
+    "P": "minecraft:paper"
   },
   "pattern": [
     "PPP",
