@@ -10,8 +10,10 @@
     "MixinServerLevel"
   ],
   "client": [
-    "client.MixinWeatherEffectRenderer",
-    "client.MixinBiomeClient"
+    "client.MixinBiomeClient",
+    "client.MixinSelectItemModelProperties",
+    "client.MixinRangeSelectItemModelProperties",
+    "client.MixinWeatherEffectRenderer"
   ],
   "injectors": {
     "defaultRequire": 1
